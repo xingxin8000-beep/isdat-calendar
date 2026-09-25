@@ -7,15 +7,12 @@ COLORS = {
     "facultatif": "#B7A6E6",
 }
 
-# Official ISDAT 2026–2027 vacations from the supplied calendar.
 HOLIDAYS = [
     (date(2026, 12, 21), date(2027, 1, 3), "Vacances de Noël"),
     (date(2027, 2, 8), date(2027, 2, 21), "Vacances d’hiver"),
     (date(2027, 4, 12), date(2027, 4, 18), "Vacances de printemps"),
 ]
 
-# Design Graphique items from the supplied official calendar.
-# (title, start_date, start_time, end_date, end_time, type, note)
 SCHOOL_EVENTS = [
     ("Rentrée administrative & pédagogique — Semestres 3 et 5", "2026-09-23", "08:30", "2026-09-23", "12:00", "obligatoire", "Design Graphique — Semestre 3"),
     ("Bilan sem. 3", "2027-01-14", "09:00", "2027-01-15", "12:00", "obligatoire", "Design Graphique"),
@@ -62,9 +59,11 @@ with open("courses.csv", encoding="utf-8-sig", newline="") as f:
     for row in csv.DictReader(f):
         anchor = datetime.strptime(row["anchor_date"], "%Y-%m-%d").date()
         typ = row["type"]
-        description = "Type : " + typ
+        repeat = row["repeat"].strip().lower()
+        interval = 1 if repeat == "weekly" else 2
+        description = ""
         if row["teacher"].strip():
-            description += "\\nEnseignant·e : " + row["teacher"]
+            description = "Enseignant·e : " + row["teacher"]
 
         ics += [
             "BEGIN:VEVENT",
@@ -77,16 +76,16 @@ with open("courses.csv", encoding="utf-8-sig", newline="") as f:
             f"DESCRIPTION:{esc(description)}",
             f"CATEGORIES:{esc(typ.upper())}",
             f"COLOR:{COLORS[typ]}",
-            "RRULE:FREQ=WEEKLY;INTERVAL=2;UNTIL=20270205T235959Z",
+            f"RRULE:FREQ=WEEKLY;INTERVAL={interval};UNTIL=20270205T235959Z",
         ]
 
-        # Remove biweekly occurrences that fall inside official vacations.
+        step = timedelta(days=7 * interval)
         exdates = []
         day = anchor
         while day <= date(2027, 2, 5):
             if in_holiday(day):
                 exdates.append(dt_local(day, row["start"]))
-            day += timedelta(days=14)
+            day += step
         if exdates:
             ics.append("EXDATE;TZID=Europe/Paris:" + ",".join(exdates))
 
