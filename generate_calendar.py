@@ -1,11 +1,10 @@
 import csv
-from datetime import datetime, date, timedelta
+from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
 
-COLORS = {
-    "obligatoire": "#FFFFFF",
-    "au choix": "#8B73D6",
-    "facultatif": "#B7A6E6",
-}
+TZ = "Europe/Paris"
+OUT_MAIN = "ISDAT_Courses.ics"
+OUT_ATELIER = "ISDAT_Atelier_Recherches.ics"
 
 HOLIDAYS = [
     (date(2026, 12, 21), date(2027, 1, 3), "Vacances de Noël"),
@@ -30,103 +29,105 @@ SCHOOL_EVENTS = [
     ("Semaine de préparation des programmes 2027 / 2028 — cours suspendus", "2027-05-11", "09:00", "2027-05-14", "18:00", "obligatoire", "Cours suspendus, présence de tous les enseignant·es"),
 ]
 
-def esc(value):
-    return str(value).replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
 
-def dt_local(day, time_text):
-    return f"{day:%Y%m%d}T{time_text.replace(':','')}00"
+def esc(value):
+    return (str(value).replace("\\", "\\\\").replace(";", "\\;")
+            .replace(",", "\\,").replace("\n", "\\n"))
+
+
+def dt(day, time_text):
+    return f"{day:%Y%m%d}T{time_text.replace(':', '')}00"
+
 
 def in_holiday(day):
     return any(start <= day <= end for start, end, _ in HOLIDAYS)
 
-stamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
 
-ics = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//ISDAT//L2 Design graphique 2026-2027//FR",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
-    "X-WR-CALNAME:ISDAT L2 Design graphique",
-    "X-WR-TIMEZONE:Europe/Paris",
-    "REFRESH-INTERVAL;VALUE=DURATION:P1D",
-    "X-PUBLISHED-TTL:P1D",
-]
+def header(name):
+    return [
+        "BEGIN:VCALENDAR", "VERSION:2.0",
+        "PRODID:-//ISDAT//L2 Design graphique 2026-2027//FR",
+        "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+        f"X-WR-CALNAME:{name}", f"X-WR-TIMEZONE:{TZ}",
+        "REFRESH-INTERVAL;VALUE=DURATION:P1D", "X-PUBLISHED-TTL:P1D",
+    ]
 
-uid = 1
 
-with open("courses.csv", encoding="utf-8-sig", newline="") as f:
-    for row in csv.DictReader(f):
-        anchor = datetime.strptime(row["anchor_date"], "%Y-%m-%d").date()
-        typ = row["type"]
-        repeat = row["repeat"].strip().lower()
-        interval = 1 if repeat == "weekly" else 2
-        description = ""
-        if row["teacher"].strip():
-            description = "Enseignant·e : " + row["teacher"]
+def add_course(ics, row, uid, stamp):
+    anchor = datetime.strptime(row["anchor_date"], "%Y-%m-%d").date()
+    repeat = row["repeat"].strip().lower()
+    interval = 1 if repeat == "weekly" else 2
+    teacher = row["teacher"].strip()
+    description = f"Enseignant·e : {teacher}" if teacher else ""
+    summary = row["course"]
+    day = anchor
+    occurrence = 0
+    while day <= date(2027, 2, 5):
+        if not in_holiday(day):
+            suffix = f"-{day:%Y%m%d}"
+            ics.extend([
+                "BEGIN:VEVENT",
+                f"UID:isdat-course-{uid}{suffix}@calendar",
+                f"DTSTAMP:{stamp}",
+                f"DTSTART;TZID={TZ}:{dt(day, row['start'])}",
+                f"DTEND;TZID={TZ}:{dt(day, row['end'])}",
+                f"SUMMARY:{esc(summary)}", "LOCATION:ISDAT",
+                f"DESCRIPTION:{esc(description)}",
+                f"CATEGORIES:{esc(row['type'].upper())}",
+                "END:VEVENT",
+            ])
+            occurrence += 1
+        day += timedelta(days=7 * interval)
 
-        ics += [
-            "BEGIN:VEVENT",
-            f"UID:isdat-course-{uid}@calendar",
-            f"DTSTAMP:{stamp}",
-            f"DTSTART;TZID=Europe/Paris:{dt_local(anchor, row['start'])}",
-            f"DTEND;TZID=Europe/Paris:{dt_local(anchor, row['end'])}",
-            f"SUMMARY:{esc(row['course'])}",
-            "LOCATION:ISDAT",
-            f"DESCRIPTION:{esc(description)}",
-            f"CATEGORIES:{esc(typ.upper())}",
-            f"COLOR:{COLORS[typ]}",
-            f"RRULE:FREQ=WEEKLY;INTERVAL={interval};UNTIL=20270205T235959Z",
-        ]
 
-        step = timedelta(days=7 * interval)
-        exdates = []
-        day = anchor
-        while day <= date(2027, 2, 5):
-            if in_holiday(day):
-                exdates.append(dt_local(day, row["start"]))
-            day += step
-        if exdates:
-            ics.append("EXDATE;TZID=Europe/Paris:" + ",".join(exdates))
-
-        ics.append("END:VEVENT")
-        uid += 1
-
-for title, start_date, start_time, end_date, end_time, typ, note in SCHOOL_EVENTS:
-    start = date.fromisoformat(start_date)
-    end = date.fromisoformat(end_date)
-    ics += [
-        "BEGIN:VEVENT",
-        f"UID:isdat-school-{uid}@calendar",
-        f"DTSTAMP:{stamp}",
-        f"DTSTART;TZID=Europe/Paris:{dt_local(start, start_time)}",
-        f"DTEND;TZID=Europe/Paris:{dt_local(end, end_time)}",
-        f"SUMMARY:{esc(title)}",
-        "LOCATION:ISDAT",
+def add_school_event(ics, item, uid, stamp):
+    title, sd, st, ed, et, typ, note = item
+    ics.extend([
+        "BEGIN:VEVENT", f"UID:isdat-school-{uid}@calendar", f"DTSTAMP:{stamp}",
+        f"DTSTART;TZID={TZ}:{dt(date.fromisoformat(sd), st)}",
+        f"DTEND;TZID={TZ}:{dt(date.fromisoformat(ed), et)}",
+        f"SUMMARY:{esc(title)}", "LOCATION:ISDAT",
         f"DESCRIPTION:{esc(note)}",
-        f"CATEGORIES:{esc('ÉVÉNEMENT SCOLAIRE / ' + typ.upper())}",
-        f"COLOR:{COLORS[typ]}",
+        f"CATEGORIES:{esc('ÉVÉNÉMENT SCOLAIRE / ' + typ.upper())}",
         "END:VEVENT",
-    ]
-    uid += 1
+    ])
 
-for start, end, title in HOLIDAYS:
-    end_exclusive = end + timedelta(days=1)
-    ics += [
-        "BEGIN:VEVENT",
-        f"UID:isdat-holiday-{start:%Y%m%d}@calendar",
-        f"DTSTAMP:{stamp}",
+
+def add_holiday(ics, item, uid, stamp):
+    start, end, title = item
+    ics.extend([
+        "BEGIN:VEVENT", f"UID:isdat-holiday-{start:%Y%m%d}@calendar", f"DTSTAMP:{stamp}",
         f"DTSTART;VALUE=DATE:{start:%Y%m%d}",
-        f"DTEND;VALUE=DATE:{end_exclusive:%Y%m%d}",
-        f"SUMMARY:{esc(title)}",
-        "LOCATION:ISDAT",
+        f"DTEND;VALUE=DATE:{(end + timedelta(days=1)):%Y%m%d}",
+        f"SUMMARY:{esc(title)}", "LOCATION:ISDAT",
         "DESCRIPTION:Vacances officielles du calendrier ISDAT 2026–2027.",
-        "CATEGORIES:VACANCES",
-        "COLOR:#6A8F8A",
-        "END:VEVENT",
-    ]
+        "CATEGORIES:VACANCES", "END:VEVENT",
+    ])
 
-ics.append("END:VCALENDAR")
 
-with open("ISDAT.ics", "w", encoding="utf-8", newline="") as f:
-    f.write("\r\n".join(ics) + "\r\n")
+def build():
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    rows = list(csv.DictReader(open("courses.csv", encoding="utf-8-sig", newline="")))
+    atelier_name = "ISDAT — Atelier / Recherches"
+    main_name = "ISDAT L2 Design graphique — Cours"
+    main, atelier = header(main_name), header(atelier_name)
+    uid = 1
+    for row in rows:
+        if row["course"].strip() == "Travail en atelier / Recherches":
+            # atelier calendar: same recurrence, separate subscription color
+            add_course(atelier, row, uid, stamp)
+        else:
+            add_course(main, row, uid, stamp)
+        uid += 1
+    for item in SCHOOL_EVENTS:
+        add_school_event(main, item, uid, stamp); uid += 1
+    for item in HOLIDAYS:
+        add_holiday(main, item, uid, stamp); uid += 1
+    main.append("END:VCALENDAR")
+    atelier.append("END:VCALENDAR")
+    Path(OUT_MAIN).write_text("\r\n".join(main) + "\r\n", encoding="utf-8")
+    Path(OUT_ATELIER).write_text("\r\n".join(atelier) + "\r\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    build()
