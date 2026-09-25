@@ -1,29 +1,27 @@
 course,teacher,weekday,start,end,anchor_date,repeat,type,location
-Histoire de l’art,Jérôme Dupeyrat,Monday,09:00,11:00,2026-09-21,biweekly,obligatoire,ISDAT
-Travail en atelier / Recherches,,Monday,11:00,12:00,2026-09-21,biweekly,obligatoire,ISDAT
-Philosophie II,Ana Samardžija Scrivener,Monday,14:00,16:00,2026-09-21,biweekly,obligatoire,ISDAT
-Des systèmes…,Romain Paul Lefèvre,Monday,16:00,18:00,2026-09-21,biweekly,obligatoire,ISDAT
+Histoire de l’art,Jérôme Dupeyrat,Monday,09:00,11:00,2026-09-21,weekly,obligatoire,ISDAT
+Travail en atelier / Recherches,,Monday,11:00,12:00,2026-09-21,weekly,obligatoire,ISDAT
+Philosophie II,Ana Samardžija Scrivener,Monday,14:00,16:00,2026-09-21,weekly,obligatoire,ISDAT
+Travail en atelier / Recherches,,Monday,16:00,18:00,2026-09-28,biweekly,obligatoire,ISDAT
+Des systèmes…,Romain Paul Lefèvre,Monday,16:00,20:00,2026-09-21,biweekly,obligatoire,ISDAT
 Des systèmes…,Romain Paul Lefèvre,Tuesday,09:00,13:00,2026-09-22,biweekly,obligatoire,ISDAT
 Des systèmes…,Romain Paul Lefèvre,Tuesday,14:00,18:00,2026-09-22,biweekly,obligatoire,ISDAT
-"Impaires, Repères",,Wednesday,09:00,11:00,2026-09-23,biweekly,obligatoire,ISDAT
-Suivi Conversations,,Wednesday,10:00,13:00,2026-09-23,biweekly,obligatoire,ISDAT
-Suivi Lost Matter,Yeelena De Bels,Wednesday,10:00,13:00,2026-09-23,biweekly,obligatoire,ISDAT
-Español,,Wednesday,13:00,14:00,2026-09-23,biweekly,au choix,ISDAT
-Origin of Serif,Corentin Noyer,Wednesday,15:00,18:00,2026-09-23,biweekly,obligatoire,ISDAT
-(AIRA) DML,"Sarah Holveck, Felip Martí-Jufresa, Serge Provost",Wednesday,20:00,23:00,2026-09-23,biweekly,facultatif,ISDAT
-Travail en atelier / Recherches,,Thursday,09:00,12:00,2026-09-21,biweekly,obligatoire,ISDAT
-Travail en atelier / Recherches,,Thursday,14:00,18:00,2026-09-21,biweekly,obligatoire,ISDAT
-Lost Matter,Yeelena De Bels,Friday,09:00,13:00,2026-09-25,biweekly,obligatoire,ISDAT
-Español,,Friday,13:00,14:00,2026-09-25,biweekly,au choix,ISDAT
-Suivi Lost Matter,Yeelena De Bels,Friday,14:00,18:00,2026-09-25,biweekly,obligatoire,ISDAT
-English,Adam Scrivener,Friday,15:00,17:00,2026-09-25,biweekly,au choix,ISDAT
 Enseignement technique logiciels 2D,Rémy Lidereau,Tuesday,09:00,11:00,2026-09-29,biweekly,obligatoire,ISDAT
 Espèces en voie d’édition,Rémy Lidereau,Tuesday,11:00,13:00,2026-09-29,biweekly,obligatoire,ISDAT
 Travail en atelier / Recherches,,Tuesday,14:00,18:00,2026-09-29,biweekly,obligatoire,ISDAT
-Conversations #1,Margot Criseo,Wednesday,09:00,12:00,2026-09-30,biweekly,obligatoire,ISDAT
+"Impaires, Repères",,Wednesday,09:00,10:00,2026-09-23,biweekly,obligatoire,ISDAT
+Suivi Conversations,Margot Criseo,Wednesday,10:00,13:00,2026-09-23,biweekly,obligatoire,ISDAT
+Suivi Lost Matter,Yeelena De Bels,Wednesday,10:00,13:00,2026-09-23,biweekly,obligatoire,ISDAT
+Conversations #1,Margot Criseo,Wednesday,09:00,13:00,2026-09-30,biweekly,obligatoire,ISDAT
+Origin of Serif,Corentin Noyer,Wednesday,14:00,18:00,2026-09-23,weekly,obligatoire,ISDAT
+(AIRA) DML,"Sarah Holveck, Felip Martí-Jufresa, Serge Provost",Wednesday,20:00,23:00,2026-09-23,biweekly,facultatif,ISDAT
 Travail en atelier / Recherches,,Thursday,09:00,12:00,2026-09-24,biweekly,obligatoire,ISDAT
-Où ?,Sébastien Dégeilh,Thursday,15:00,18:00,2026-09-24,biweekly,obligatoire,ISDAT
-Travail en atelier / Recherches,,Friday,09:00,12:00,2026-09-25,biweekly,obligatoire,ISDAT
-Travail en atelier / Recherches,,Friday,14:00,15:00,2026-09-25,biweekly,obligatoire,ISDAT
-English,Adam Scrivener,Friday,15:00,17:00,2026-09-25,biweekly,au choix,ISDAT
-Travail en atelier / Recherches,,Friday,17:00,18:00,2026-09-25,biweekly,obligatoire,ISDAT
+Travail en atelier / Recherches,,Thursday,09:00,12:00,2026-10-01,biweekly,obligatoire,ISDAT
+Travail en atelier / Recherches,,Thursday,14:00,18:00,2026-09-24,biweekly,obligatoire,ISDAT
+Où ?,Sébastien Dégeilh,Thursday,14:00,18:00,2026-10-01,biweekly,obligatoire,ISDAT
+Lost Matter,Yeelena De Bels,Friday,09:00,13:00,2026-10-02,biweekly,obligatoire,ISDAT
+Suivi Lost Matter,Yeelena De Bels,Friday,14:00,18:00,2026-10-02,biweekly,obligatoire,ISDAT
+English,Adam Scrivener,Friday,15:00,17:00,2026-09-25,weekly,au choix,ISDAT
+Travail en atelier / Recherches,,Friday,09:00,12:00,2026-10-02,biweekly,obligatoire,ISDAT
+Travail en atelier / Recherches,,Friday,14:00,15:00,2026-10-02,biweekly,obligatoire,ISDAT
+Travail en atelier / Recherches,,Friday,17:00,18:00,2026-10-02,biweekly,obligatoire,ISDAT
